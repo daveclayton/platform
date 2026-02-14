@@ -1,0 +1,51 @@
+---
+version: "3"
+services:
+  syncthing-source:
+    image: syncthing/syncthing
+    container_name: syncthing
+    hostname: dt-source
+    ports:
+      - 8384:8384
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - D:\data\syncthing\dt-source:/var/syncthing
+
+      # ST Folders
+      - D:\data\syncthing\stfolders\immich:/var/syncthing/immich/.stfolder:rw
+      - D:\data\syncthing\stfolders\docs:/var/syncthing/docs/.stfolder:rw
+      
+      # Docs and backups (read-only)
+      - D:\docs:/var/syncthing/docs/backups:ro
+
+      # Immich data and backups (read-only)
+      - D:\data\immich\app\backups:/var/syncthing/immich/backups:ro
+      - D:\data\immich\app\library:/var/syncthing/immich/library:ro
+
+    restart: unless-stopped
+    healthcheck:
+      test: curl -fkLsS -m 2 127.0.0.1:8384/rest/noauth/health | grep -o --color=never OK || exit 1
+      interval: 1m
+      timeout: 10s  
+      retries: 3
+
+  syncthing-local-backup:
+    image: syncthing/syncthing
+    container_name: syncthing-local-backup
+    hostname: dt-local-backup
+    ports:
+      - 8385:8384
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - D:\data\syncthing\dt-local-backup:/var/syncthing
+      - E:\backups:/var/syncthing/backups
+    restart: unless-stopped
+    healthcheck:
+      test: curl -fkLsS -m 2 127.0.0.1:8384/rest/noauth/health | grep -o --color=never OK || exit 1
+      interval: 1m
+      timeout: 10s
+      retries: 3
