@@ -7,8 +7,8 @@ echo Dumping database to "$UPLOAD_LOCATION"/database-backup/immich-database.sql
 docker exec -t immich_postgres pg_dumpall --clean --if-exists --username=postgres > "$UPLOAD_LOCATION"/database-backup/immich-database.sql
 
 echo "Creating borg backup of $UPLOAD_LOCATION to $BACKUP_PATH/immich-borg"
-borg create "$BACKUP_PATH/immich-borg::{now}" "$UPLOAD_LOCATION" --exclude "$UPLOAD_LOCATION"/thumbs/ --exclude "$UPLOAD_LOCATION"/encoded-video/
+borg create --progress "$BACKUP_PATH/immich-borg::{now}" "$UPLOAD_LOCATION" --exclude "$UPLOAD_LOCATION"/thumbs/ --exclude "$UPLOAD_LOCATION"/encoded-video/
 echo "Pruning old backups and compacting the repository"
-borg prune --keep-weekly=4 --keep-monthly=3 "$BACKUP_PATH"/immich-borg
+borg prune --progress --keep-weekly=4 --keep-monthly=3 "$BACKUP_PATH"/immich-borg
 echo "Compacting borg repository to save space"
-borg compact "$BACKUP_PATH"/immich-borg
+borg compact --progress "$BACKUP_PATH"/immich-borg
