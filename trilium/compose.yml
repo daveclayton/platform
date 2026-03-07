@@ -4,30 +4,11 @@
 
 networks:
   trilium:
-    external: false
+    driver: bridge
 
 name: trilium
 
 services:
-  ts-server:
-    image: tailscale/tailscale:latest
-    hostname: trilium
-    environment:
-      - TS_AUTHKEY=$TS_AUTH_KEY
-      - TS_EXTRA_ARGS=--advertise-tags=tag:trilium
-      - TS_STATE_DIR=/var/lib/tailscale
-      - TS_SERVE_CONFIG=/config/serve.json
-    volumes:
-      - ./tailscale:/config
-      - ${TAILSCALE_DATA_LOCATION}:/var/lib/tailscale
-    devices:
-      - /dev/net/tun:/dev/net/tun
-    cap_add:
-      - net_admin
-      - sys_module
-    restart: always
-    networks:
-      - trilium
 
   trilium-server:
     # Optionally, replace `latest` with a version tag like `v0.90.3`
