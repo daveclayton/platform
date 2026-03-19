@@ -30,14 +30,11 @@
 # documentation.
 
 
-networks:
-  paperless:
-    driver: bridge
-
 name: paperless
 
 services:
   broker:
+
     networks:
       - paperless
     image: docker.io/library/redis:8
@@ -47,14 +44,14 @@ services:
   webserver:
     networks:
       - paperless
+      - proxy_access
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
     restart: unless-stopped
+
     depends_on:
       - broker
       - gotenberg
       - tika
-    ports:
-      - "8000:8000"
     volumes:
       - ${BACKUP_LOCATION}:/usr/src/paperless/backup
       - ${DATA_LOCATION}:/usr/src/paperless/data
@@ -68,6 +65,7 @@ services:
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
       PAPERLESS_FILENAME_FORMAT: "users/{{ owner_username }}/{{ created_year }}/{{ created_month }}/{{ created_day }}/{{ correspondent }}/{{ title }}"
   gotenberg:
+
     networks:
       - paperless
     image: docker.io/gotenberg/gotenberg:8.25
@@ -79,6 +77,7 @@ services:
       - "--chromium-disable-javascript=true"
       - "--chromium-allow-list=file:///tmp/.*"
   tika:
+
     networks:
       - paperless
     image: docker.io/apache/tika:latest
@@ -87,3 +86,9 @@ volumes:
   data:
   media:
   redisdata:
+
+networks:
+  proxy_access:
+    external: true
+  paperless:
+    external: false

@@ -1,0 +1,19 @@
+services:
+  app:
+    image: 'jc21/nginx-proxy-manager:latest'
+    restart: unless-stopped
+    environment:
+      TZ: "Europe/London"
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    volumes:
+      - ${DATA_LOCATION}/data:/data
+      - ${DATA_LOCATION}/letsencrypt:/etc/letsencrypt
+    networks:
+      - proxy_access
+
+networks:
+  proxy_access:
+    external: true

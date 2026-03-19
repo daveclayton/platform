@@ -7,9 +7,6 @@
 #
 # The compose file on main may not be compatible with the latest release.
 
-networks:
-  immich:
-    driver: bridge
 
 name: immich
 
@@ -26,8 +23,6 @@ services:
       - /etc/localtime:/etc/localtime:ro
     env_file:
       - .env
-    ports:
-      - '2283:2283'
     depends_on:
       - redis
       - database
@@ -36,6 +31,7 @@ services:
       disable: false
     networks:
       - immich
+      - proxy_access
 
   immich-machine-learning:
     container_name: immich_machine_learning
@@ -45,14 +41,14 @@ services:
     # extends: # uncomment this section for hardware acceleration - see https://docs.immich.app/features/ml-hardware-acceleration
     #   file: hwaccel.ml.yml
     #   service: cpu # set to one of [armnn, cuda, rocm, openvino, openvino-wsl, rknn] for accelerated inference - use the `-wsl` version for WSL2 where applicable
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities:
-                - gpu
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities:
+    #             - gpu
     volumes:
       - model-cache:/cache
     env_file:
@@ -94,3 +90,9 @@ services:
 
 volumes:
   model-cache:
+
+networks:
+  proxy_access:
+    external: true
+  immich:
+    external: false
