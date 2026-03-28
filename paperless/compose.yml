@@ -64,6 +64,7 @@ services:
       PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
       PAPERLESS_FILENAME_FORMAT: "users/{{ owner_username }}/{{ created_year }}/{{ created_month }}/{{ created_day }}/{{ correspondent }}/{{ title }}"
+      PAPERLESS_URL: ${URL}
   gotenberg:
 
     networks:

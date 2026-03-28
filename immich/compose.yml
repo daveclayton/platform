@@ -31,7 +31,7 @@ services:
       disable: false
     networks:
       - immich
-      - proxy_access
+      - immich_ts
 
   immich-machine-learning:
     container_name: immich_machine_learning
@@ -88,11 +88,31 @@ services:
     networks:
       - immich
 
+  ts-server:
+    image: tailscale/tailscale:latest
+    hostname: i
+    environment:
+      - TS_AUTHKEY=$DC_TS_AUTH_KEY
+      - TS_EXTRA_ARGS=--advertise-tags=tag:immich
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_SERVE_CONFIG=/config/serve.json
+    volumes:
+      - ./tailscale:/config
+      - ${DC_TS_DATA_LOCATION}:/var/lib/tailscale
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - net_admin
+      - sys_module
+    restart: always
+    networks:
+      - immich_ts
+
 volumes:
   model-cache:
 
 networks:
-  proxy_access:
-    external: true
   immich:
+    external: false
+  immich_ts:
     external: false

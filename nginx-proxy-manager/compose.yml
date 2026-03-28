@@ -6,7 +6,6 @@ services:
       TZ: "Europe/London"
     ports:
       - '80:80'
-      - '81:81'
       - '443:443'
     volumes:
       - ${DATA_LOCATION}/data:/data

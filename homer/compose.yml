@@ -1,0 +1,16 @@
+services:
+  homer:
+    image: b4bz/homer
+    container_name: homer
+    volumes:
+      - ${DATA_LOCATION}:/www/assets # Make sure your local config directory exists
+    user: 1000:1000 # default
+    environment:
+      - INIT_ASSETS=1 # default, requires the config directory to be writable for the container user (see user option)
+    restart: unless-stopped
+    networks:
+      - proxy_access
+
+networks:
+    proxy_access:
+      external: true
