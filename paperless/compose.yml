@@ -44,7 +44,7 @@ services:
   webserver:
     networks:
       - paperless
-      - proxy_access
+      - paperless_ts
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
     restart: unless-stopped
 
@@ -65,8 +65,8 @@ services:
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
       PAPERLESS_FILENAME_FORMAT: "users/{{ owner_username }}/{{ created_year }}/{{ created_month }}/{{ created_day }}/{{ correspondent }}/{{ title }}"
       PAPERLESS_URL: ${URL}
-  gotenberg:
 
+  gotenberg:
     networks:
       - paperless
     image: docker.io/gotenberg/gotenberg:8.25
@@ -77,19 +77,43 @@ services:
       - "gotenberg"
       - "--chromium-disable-javascript=true"
       - "--chromium-allow-list=file:///tmp/.*"
-  tika:
 
+  tika:
     networks:
       - paperless
     image: docker.io/apache/tika:latest
     restart: unless-stopped
+
+
+  ts-server:
+    image: tailscale/tailscale:latest
+    hostname: d
+    environment:
+      - TS_AUTHKEY=$DC_TS_AUTH_KEY
+      - TS_EXTRA_ARGS=--advertise-tags=tag:paperless
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_SERVE_CONFIG=/config/serve.json
+    volumes:
+      - ./tailscale:/config
+      - ${DC_TS_DATA_LOCATION}:/var/lib/tailscale
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - net_admin
+      - sys_module
+    restart: always
+    networks:
+      - paperless_ts
+
+
 volumes:
   data:
   media:
   redisdata:
 
 networks:
-  proxy_access:
-    external: true
   paperless:
     external: false
+  paperless_ts:
+    external: false
+
