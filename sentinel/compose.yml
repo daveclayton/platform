@@ -1,0 +1,22 @@
+services:
+  sentinel:
+    image: willluck/docker-sentinel:latest
+    container_name: docker-sentinel
+    restart: unless-stopped
+    networks:
+      - proxy_access
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - sentinel-data:/data
+    environment:
+      SENTINEL_POLL_INTERVAL: 6h
+      SENTINEL_DEFAULT_POLICY: manual
+    labels:
+      sentinel.self: "true"
+
+volumes:
+  sentinel-data:
+
+networks:
+  proxy_access:
+    external: true
