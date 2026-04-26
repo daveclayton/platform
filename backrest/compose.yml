@@ -1,0 +1,30 @@
+version: "3.8"
+services:
+  backrest:
+    image: ghcr.io/garethgeorge/backrest:latest
+    container_name: backrest
+    hostname: backrest
+    volumes:
+      - /data/backrest/data:/data
+      - /data/backrest/config:/config
+      - /data/backrest/cache:/cache
+      - /data/backrest/tmp:/tmp
+      - /data/backrest/rclone:/root/.config/rclone # Mount for rclone config (needed when using rclone remotes)
+      - /backups:/backups
+      - /data:/ext-data
+    environment:
+      - BACKREST_DATA=/data
+      - BACKREST_CONFIG=/config/config.json
+      - XDG_CACHE_HOME=/cache
+      - TMPDIR=/tmp
+      - TZ=Europe/London
+    ports:
+      - "9898:9898"
+    restart: unless-stopped
+    networks:
+      - proxy_access
+
+networks:
+    proxy_access:
+      external: true
+
