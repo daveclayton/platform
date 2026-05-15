@@ -1,15 +1,23 @@
-version: "3.8"
 services:
   backrest:
     image: ghcr.io/garethgeorge/backrest:latest
     container_name: backrest
     hostname: backrest
+    labels: 
+      - traefik.enable=true
+      - traefik.http.routers.backrest.rule=Host(`backrest.${BASE_DOMAIN}`)
+      - traefik.http.routers.backrest.tls.certresolver=letsencrypt
+      - traefik.http.routers.backrest.entrypoints=https
+      - traefik.http.services.backrest.loadbalancer.server.port=9898
+      - traefik.http.services.backrest.loadbalancer.server.scheme=http
+      - serverstransport.insecureskipverify=true
+
     volumes:
       - /data/backrest/data:/data
       - /data/backrest/config:/config
       - /data/backrest/cache:/cache
       - /data/backrest/tmp:/tmp
-      - /data/backrest/rclone:/root/.config/rclone # Mount for rclone config (needed when using rclone remotes)
+      - /data/backrest/rclone:/root/.config/rclone
       - /backups:/backups
       - /data:/ext-data
     environment:
@@ -18,13 +26,13 @@ services:
       - XDG_CACHE_HOME=/cache
       - TMPDIR=/tmp
       - TZ=Europe/London
-    ports:
-      - "9898:9898"
     restart: unless-stopped
     networks:
-      - proxy_access
+      - traefik
+      - homarr
 
 networks:
-    proxy_access:
+  homarr:
       external: true
-
+  traefik:
+      external: true

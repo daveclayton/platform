@@ -1,7 +1,9 @@
 
 networks:
-  authentik_ts:
-    external: false
+  homarr:
+    external: true
+  traefik:
+    external: true
   authentik:
     external: false
 
@@ -27,11 +29,22 @@ services:
       - authentik
     volumes:
     - database:/var/lib/postgresql/data
-  server:
+  authentik-server:
     command: server
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.authentik-rtr.rule=Host(`authentik.${BASE_DOMAIN}`)
+      - traefik.http.routers.authentik-rtr.tls.certresolver=letsencrypt
+      - traefik.http.routers.authentik-rtr.entrypoints=https
+      - traefik.http.services.authentik-svc.loadbalancer.server.port=9000
+      - traefik.http.services.authentik-svc.loadbalancer.server.scheme=http
+      - "traefik.http.routers.authentik-output-rtr.rule=HostRegexp(`{subdomain:[a-z0-9-]+}.${BASE_DOMAIN}`) && PathPrefix(`/outpost.goauthentik.io/`)"
+      - "traefik.http.routers.authentik-rtr.service=authentik-svc"
+      - serverstransport.insecureskipverify=true
     networks:
+      - traefik
+      - homarr
       - authentik
-      - authentik_ts
     depends_on:
       postgresql:
         condition: service_healthy
@@ -44,14 +57,12 @@ services:
       AUTHENTIK_POSTGRESQL__USER: ${PG_USER:-authentik}
       AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:?secret key required}
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2026.2.1}
-    # ports:
-    # - ${COMPOSE_PORT_HTTP:-9000}:9000
-    # - ${COMPOSE_PORT_HTTPS:-9443}:9443
     restart: unless-stopped
     shm_size: 512mb
     volumes:
     - ${DATA_LOCATION}/data:/data
     - ${DATA_LOCATION}/custom-templates:/templates
+
   worker:
     command: worker
     depends_on:
@@ -76,26 +87,6 @@ services:
     - ${DATA_LOCATION}/data:/data
     - ${DATA_LOCATION}/certs:/certs
     - ${DATA_LOCATION}/custom-templates:/templates
-
-  ts-server:
-    image: tailscale/tailscale:latest
-    hostname: a
-    environment:
-      - TS_AUTHKEY=$TS_AUTH_KEY
-      - TS_EXTRA_ARGS=--advertise-tags=tag:authentik
-      - TS_STATE_DIR=/var/lib/tailscale
-      - TS_SERVE_CONFIG=/config/serve.json
-    volumes: 
-      - ./tailscale:/config
-      - ${TS_DATA_LOCATION}:/var/lib/tailscale
-    devices:
-      - /dev/net/tun:/dev/net/tun
-    cap_add:
-      - net_admin
-      - sys_module
-    restart: always 
-    networks:
-      - authentik_ts
 
 volumes:
   database:
