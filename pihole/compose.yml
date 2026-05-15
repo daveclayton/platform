@@ -9,9 +9,7 @@ services:
       - "53:53/tcp"
       - "53:53/udp"
       # Default HTTP Port
-      - "80:80/tcp"
       # Default HTTPs Port. FTL will generate a self-signed certificate
-      - "443:443/tcp"
       # Uncomment the line below if you are using Pi-hole as your DHCP server
       - "67:67/udp"
       # Uncomment the line below if you are using Pi-hole as your NTP server
@@ -38,11 +36,28 @@ services:
       - SYS_TIME
       # Optional, if Pi-hole should get some more processing time
       - SYS_NICE
+    labels: 
+      - traefik.enable=true
+      - traefik.http.routers.pihole.rule=Host(`pihole.${BASE_DOMAIN}`)
+      - traefik.http.routers.pihole.tls.certresolver=letsencrypt
+      - traefik.http.routers.pihole.entrypoints=https
+      - traefik.http.services.pihole.loadbalancer.server.port=80
+      - traefik.http.services.pihole.loadbalancer.server.scheme=http
+      - serverstransport.insecureskipverify=true
     restart: unless-stopped
     networks:
       pub_net:
         ipv4_address: ${PIHOLE_IP}
+      homarr: 
+      traefik: 
 
 networks:
+  traefik:
+    name: traefik
+    external: true
+  homarr:
+    name: homarr
+    external: true
   pub_net:
+    name: pub_net
     external: true

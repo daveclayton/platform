@@ -3,8 +3,10 @@
 # To run in the background, use `docker-compose up -d`
 
 networks:
-  trilium_ts:
-    external: false
+  traefik:
+    external: true
+  homarr:
+    external: true
 
 name: trilium
 
@@ -23,25 +25,14 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     networks:
-      - trilium_ts
-
-  ts-server:
-    image: tailscale/tailscale:latest
-    hostname: t
-    environment:
-      - TS_AUTHKEY=$DC_TS_AUTH_KEY
-      - TS_EXTRA_ARGS=--advertise-tags=tag:trilium
-      - TS_STATE_DIR=/var/lib/tailscale
-      - TS_SERVE_CONFIG=/config/serve.json
-    volumes:
-      - ./tailscale:/config
-      - ${DC_TS_DATA_LOCATION}:/var/lib/tailscale
-    devices:
-      - /dev/net/tun:/dev/net/tun
-    cap_add:
-      - net_admin
-      - sys_module
-    restart: always
-    networks:
-      - trilium_ts
+      - homarr
+      - traefik
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.trilium.rule=Host(`trilium.${BASE_DOMAIN}`)
+      - traefik.http.routers.trilium.tls.certresolver=letsencrypt
+      - traefik.http.routers.trilium.entrypoints=https
+      - traefik.http.services.trilium.loadbalancer.server.port=8080
+      - traefik.http.services.trilium.loadbalancer.server.scheme=http
+      - serverstransport.insecureskipverify=true
 
