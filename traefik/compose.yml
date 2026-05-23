@@ -1,10 +1,10 @@
 services:
   traefik:
     image: traefik:latest
+    restart: unless-stopped
     ports:
       - 80:80
       - 443:443
-      - 8080:8080
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ${DATA_LOCATION}/traefik.yml:/etc/traefik/traefik.yml:ro
@@ -15,10 +15,6 @@ services:
       CF_API_EMAIL: ${CLOUDFLARE_EMAIL}
       CF_DNS_API_TOKEN: ${CLOUDFLARE_TOKEN}
       CF_ZONE_API_TOKEN: ${CLOUDFLARE_TOKEN}
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.api.service=api@internal
-      - traefik.http.routers.api.entrypoints=http,https,traefik
 
 networks:
   traefik:

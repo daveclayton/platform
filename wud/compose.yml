@@ -1,0 +1,31 @@
+services:
+  whatsupdocker:
+    image: getwud/wud
+    container_name: wud
+    restart: unless-stopped
+    env_file:
+      - .env
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.wud.rule=Host(`wud.${BASE_DOMAIN}`)
+      - traefik.http.routers.wud.tls.certresolver=letsencrypt
+      - traefik.http.routers.wud.entrypoints=https
+      - traefik.http.services.wud.loadbalancer.server.port=3000
+      - traefik.http.services.wud.loadbalancer.server.scheme=http
+      - serverstransport.insecureskipverify=true
+    networks:
+      - homarr
+      - traefik
+      
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${GIT_REPO_FOLDER}/authentik/compose.yml:/wud/authentik/compose.yml
+    environment:
+      - WUD_TRIGER_DOCKERCOMPOSE_AUTHENTIK_FILE=/wud/authentik/compose.yml
+      - WUD_TRIGER_DOCKERCOMPOSE_AUTHENTIK_PRUNE=true
+
+networks:
+  homarr:
+    external: true
+  traefik:
+    external: true
