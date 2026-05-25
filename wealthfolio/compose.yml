@@ -21,8 +21,8 @@ services:
       - serverstransport.insecureskipverify=true
 
     networks:
-      - traefik
-      - homarr
+      - internal_only
+      - external_access
     volumes:
       - ${DATA_LOCATION}/data:/data
     environment:
@@ -73,7 +73,7 @@ services:
       - /tmp:size=64M
 
 networks:
-  traefik:
+  internal_only:
     external: true
-  homarr:
+  external_access:
     external: true
