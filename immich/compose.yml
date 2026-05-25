@@ -30,9 +30,7 @@ services:
     healthcheck:
       disable: false
     networks:
-      - immich
-      - traefik
-      - homarr
+      - internal_only
     labels:
       - traefik.enable=true
       - traefik.http.routers.immich.rule=Host(`immich.${BASE_DOMAIN}`)
@@ -67,7 +65,7 @@ services:
     healthcheck:
       disable: false
     networks:
-      - immich
+      - internal_only
 
   redis:
     container_name: immich_redis
@@ -76,7 +74,7 @@ services:
       test: redis-cli ping || exit 1
     restart: always
     networks:
-      - immich
+      - internal_only
 
   database:
     container_name: immich_postgres
@@ -96,15 +94,11 @@ services:
     healthcheck:
       disable: false
     networks:
-      - immich
+      - internal_only
 
 volumes:
   model-cache:
 
 networks:
-  homarr:
+  internal_only:
     external: true
-  traefik:
-    external: true
-  immich:
-    external: false

@@ -1,32 +1,18 @@
-# Running `docker-compose up` will create/use the "trilium-data" directory in the user home
-# Run `TRILIUM_DATA_DIR=/path/of/your/choice docker-compose up` to set a different directory
-# To run in the background, use `docker-compose up -d`
-
-networks:
-  traefik:
-    external: true
-  homarr:
-    external: true
-
 name: trilium
 
 services:
 
   trilium-server:
-    # Optionally, replace `latest` with a version tag like `v0.90.3`
-    # Using `latest` may cause unintended updates to the container
     image: triliumnext/trilium:latest
-    # Restart the container unless it was stopped by the user
     restart: always
+    container_name: trilium
+    hostname: trilium
     volumes:
-      # Unless TRILIUM_DATA_DIR is set, the data will be stored in the "trilium-data" directory in the home directory.
-      # This can also be changed with by replacing the line below with `- /path/of/your/choice:/home/node/trilium-data
       - ${TRILIUM_DATA_DIR:-~/trilium-data}:/home/node/trilium-data
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     networks:
-      - homarr
-      - traefik
+      - internal_only
     labels:
       - traefik.enable=true
       - traefik.http.routers.trilium.rule=Host(`trilium.${BASE_DOMAIN}`)
@@ -36,3 +22,6 @@ services:
       - traefik.http.services.trilium.loadbalancer.server.scheme=http
       - serverstransport.insecureskipverify=true
 
+networks:
+  internal_only:
+    external: true

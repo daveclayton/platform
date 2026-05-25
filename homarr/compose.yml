@@ -9,8 +9,7 @@ services:
     environment:
       - SECRET_ENCRYPTION_KEY=${ENCRYPTION_KEY}
     networks:
-      - traefik
-      - homarr
+      - internal_only
     labels:
       - traefik.enable=true
       - traefik.http.routers.homarr.rule=Host(`homarr.${BASE_DOMAIN}`)
@@ -21,7 +20,5 @@ services:
       - serverstransport.insecureskipverify=true
 
 networks:
-  traefik:
-    external: true
-  homarr:
+  internal_only:
     external: true

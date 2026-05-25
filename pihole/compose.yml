@@ -48,15 +48,13 @@ services:
     networks:
       pub_net:
         ipv4_address: ${PIHOLE_IP}
-      homarr: 
-      traefik: 
+      internal_only:
+      external_access:
 
 networks:
-  traefik:
-    name: traefik
+  internal_only:
     external: true
-  homarr:
-    name: homarr
+  external_access:
     external: true
   pub_net:
     name: pub_net

@@ -36,17 +36,19 @@ services:
   broker:
 
     networks:
-      - paperless
+      - internal_only
     image: docker.io/library/redis:8
+    dns: ${DNS_SERVER}
+
     restart: unless-stopped
     volumes:
       - redisdata:/data
 
   paperless-server:
+    dns: ${DNS_SERVER}
+
     networks:
-      - paperless
-      - traefik
-      - homarr
+      - internal_only
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
     restart: unless-stopped
 
@@ -78,8 +80,10 @@ services:
 
 
   gotenberg:
+    dns: ${DNS_SERVER}
+
     networks:
-      - paperless
+      - internal_only
     image: docker.io/gotenberg/gotenberg:8.25
     restart: unless-stopped
     # The gotenberg chromium route is used to convert .eml files. We do not
@@ -90,8 +94,10 @@ services:
       - "--chromium-allow-list=file:///tmp/.*"
 
   tika:
+    dns: ${DNS_SERVER}
+
     networks:
-      - paperless
+      - internal_only
     image: docker.io/apache/tika:latest
     restart: unless-stopped
 
@@ -101,10 +107,6 @@ volumes:
   redisdata:
 
 networks:
-  homarr:
+  internal_only:
     external: true
-  traefik:
-    external: true
-  paperless:
-    external: false
 

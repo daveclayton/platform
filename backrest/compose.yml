@@ -3,6 +3,7 @@ services:
     image: ghcr.io/garethgeorge/backrest:latest
     container_name: backrest
     hostname: backrest
+    dns: ${DNS_SERVER}
     labels: 
       - traefik.enable=true
       - traefik.http.routers.backrest.rule=Host(`backrest.${BASE_DOMAIN}`)
@@ -28,11 +29,8 @@ services:
       - TZ=Europe/London
     restart: unless-stopped
     networks:
-      - traefik
-      - homarr
+      - internal_only
 
 networks:
-  homarr:
-      external: true
-  traefik:
+  internal_only:
       external: true

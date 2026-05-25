@@ -1,5 +1,7 @@
 services:
   traefik:
+    hostname: traefik
+    container_name: traefik
     image: traefik:latest
     restart: unless-stopped
     ports:
@@ -10,12 +12,15 @@ services:
       - ${DATA_LOCATION}/traefik.yml:/etc/traefik/traefik.yml:ro
       - ${DATA_LOCATION}/certs:/etc/certs
     networks:
-      - traefik
+      - internal_only
+      - external_access
     environment:
       CF_API_EMAIL: ${CLOUDFLARE_EMAIL}
       CF_DNS_API_TOKEN: ${CLOUDFLARE_TOKEN}
       CF_ZONE_API_TOKEN: ${CLOUDFLARE_TOKEN}
 
 networks:
-  traefik:
+  external_access:
+    external: true
+  internal_only:
     external: true

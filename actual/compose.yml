@@ -1,0 +1,25 @@
+services:
+  actual_server:
+    image: docker.io/actualbudget/actual-server:latest
+    hostname: actual
+    container_name: actual
+    dns: ${DNS_SERVER}
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.actual.rule=Host(`actual.${BASE_DOMAIN}`)
+      - traefik.http.routers.actual.tls.certresolver=letsencrypt
+      - traefik.http.routers.actual.entrypoints=https
+      - traefik.http.services.actual.loadbalancer.server.port=5006
+      - traefik.http.services.actual.loadbalancer.server.scheme=http
+    networks:
+      - internal_only
+      - external_access
+    volumes:
+      - ${DATA_LOCATION}:/data
+    restart: unless-stopped
+
+networks:
+  internal_only:
+    external: true
+  external_access:
+    external: true
