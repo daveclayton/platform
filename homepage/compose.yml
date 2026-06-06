@@ -1,0 +1,31 @@
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    dns: ${DNS_SERVER}
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: dc404.uk # required, may need port. See gethomepage.dev/installation/#homepage_allowed_hosts
+      PUID: 1000 # optional, your user id
+      PGID: 1000 # optional, your group id
+    volumes:
+      - ${DATA_LOCATION}:/app/config # Make sure your local config directory exists
+      - /var/run/docker.sock:/var/run/docker.sock:ro # optional, for docker integrations
+    restart: unless-stopped
+    networks:
+      - external_access
+      - internal_only
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.homepage.rule=Host(`${BASE_DOMAIN}`)
+      - traefik.http.routers.homepage.tls.certresolver=letsencrypt
+      - traefik.http.routers.homepage.entrypoints=https
+      - traefik.http.services.homepage.loadbalancer.server.port=3000
+      - traefik.http.services.homepage.loadbalancer.server.scheme=http
+      - serverstransport.insecureskipverify=true
+
+networks:
+  internal_only:
+    external: true
+  external_access:
+    external: true
+

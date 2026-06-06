@@ -1,0 +1,34 @@
+networks:
+  internal_only:
+    external: true
+
+services:
+  # Socket proxy is used by default,
+  # but you can mount docker socket directly
+  # and remove this service and DOCKER_HOST variable
+  socket-proxy:
+    image: lscr.io/linuxserver/socket-proxy:latest
+    container_name: socket-proxy
+    environment:
+      CONTAINERS: 1
+      EVENTS: 1
+      IMAGES: 1
+      INFO: 1
+      LOG_LEVEL: warning
+      PING: 1
+      NETWORKS: 1
+      POST: 1
+      TZ: Europe/London
+      VERSION: 1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /run
+    networks:
+      - internal_only
+    labels:
+      dev.quenary.tugtainer.protected: True
+ 
+ 

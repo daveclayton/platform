@@ -1,6 +1,6 @@
 services:
   actual_server:
-    image: docker.io/actualbudget/actual-server:latest
+    image: docker.io/actualbudget/actual-server:26.6.0
     hostname: actual
     container_name: actual
     dns: ${DNS_SERVER}
@@ -11,6 +11,12 @@ services:
       - traefik.http.routers.actual.entrypoints=https
       - traefik.http.services.actual.loadbalancer.server.port=5006
       - traefik.http.services.actual.loadbalancer.server.scheme=http
+      - homepage.group=Finance
+      - homepage.name=Actual Budget
+      - homepage.icon=actual-budget.png
+      - homepage.href=http://actual.dc404.uk/
+      - homepage.description=Budget and accounts
+
     networks:
       - internal_only
       - external_access

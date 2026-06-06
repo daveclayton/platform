@@ -1,0 +1,55 @@
+services:
+  mealie:
+    image: ghcr.io/mealie-recipes/mealie:v3.19.2 
+    container_name: mealie
+    restart: unless-stopped
+    dns: ${DNS_SERVER}
+    ports:
+      - "9000:9000"
+    deploy:
+      resources:
+        limits:
+          memory: 1000M # 
+    volumes:
+      - ${DATA_LOCATION}:/app/data/
+    environment:
+      # Set Backend ENV Variables Here
+      ALLOW_SIGNUP: "true"
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/London
+      BASE_URL: https://mealie.${BASE_DOMAIN}
+      OIDC_AUTH_ENABLED: ${OIDC_AUTH_ENABLED}
+      OIDC_PROVIDER_NAME: ${OIDC_PROVIDER_NAME}
+      OIDC_CONFIGURATION_URL: ${OIDC_CONFIGURATION_URL}
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID}
+      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET}
+      OIDC_SIGNUP_ENABLED: ${OIDC_SIGNUP_ENABLED}
+      OIDC_USER_GROUP: ${OIDC_USER_GROUP}
+      OIDC_ADMIN_GROUP: ${OIDC_ADMIN_GROUP}
+      OIDC_AUTO_REDIRECT: ${OIDC_AUTO_REDIRECT}
+      OIDC_REMEMBER_ME: ${OIDC_REMEMBER_ME}
+      
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mealie.rule=Host(`mealie.${BASE_DOMAIN}`)
+      - traefik.http.routers.mealie.tls.certresolver=letsencrypt
+      - traefik.http.routers.mealie.entrypoints=https
+      - traefik.http.services.mealie.loadbalancer.server.port=9000
+      - traefik.http.services.mealie.loadbalancer.server.scheme=http
+      - serverstransport.insecureskipverify=true
+      - homepage.group=Documents
+      - homepage.name=Mealie
+      - homepage.icon=mealie.png
+      - homepage.href=https://mealie.dc404.uk/
+      - homepage.description=Recipies and meal planning
+
+    networks:
+      - internal_only
+      - external_access
+
+networks:
+  external_access:
+    external: true
+  internal_only:
+    external: true

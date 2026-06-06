@@ -37,7 +37,11 @@ services:
       - "traefik.http.routers.authentik-output-rtr.rule=HostRegexp(`{subdomain:[a-z0-9-]+}.${BASE_DOMAIN}`) && PathPrefix(`/outpost.goauthentik.io/`)"
       - "traefik.http.routers.authentik-rtr.service=authentik-svc"
       - serverstransport.insecureskipverify=true
-      - 'wud.tag.include=^\d+\.\d+\.\d+$$'
+      - homepage.group=Admin
+      - homepage.name=Authentik
+      - homepage.icon=authentik.png
+      - homepage.href=https://authentic.dc404.uk/
+      - homepage.description=IDP
 
     networks:
       - internal_only

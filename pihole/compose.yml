@@ -44,6 +44,12 @@ services:
       - traefik.http.services.pihole.loadbalancer.server.port=80
       - traefik.http.services.pihole.loadbalancer.server.scheme=http
       - serverstransport.insecureskipverify=true
+      - homepage.group=Admin
+      - homepage.name=Pihole
+      - homepage.icon=pi-hole.png
+      - homepage.href=https://pihole.dc404.uk/
+      - homepage.description=DNS
+
     restart: unless-stopped
     networks:
       pub_net:

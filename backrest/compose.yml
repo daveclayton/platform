@@ -12,6 +12,11 @@ services:
       - traefik.http.services.backrest.loadbalancer.server.port=9898
       - traefik.http.services.backrest.loadbalancer.server.scheme=http
       - serverstransport.insecureskipverify=true
+      - homepage.group=Admin
+      - homepage.name=Backrest
+      - homepage.icon=backrest.png
+      - homepage.href=https://backrest.dc404.uk/
+      - homepage.description=Backups
 
     volumes:
       - /data/backrest/data:/data
@@ -21,6 +26,21 @@ services:
       - /data/backrest/rclone:/root/.config/rclone
       - /backups:/backups
       - /data:/ext-data
+
+      # Env files to backup
+
+      - ../homepage/.env:/ext-repo/homepage/.env
+      - ../immich/.env:/ext-repo/immich/.env
+      - ../traefik/.env:/ext-repo/traefik/.env
+      - ../wealthfolio/.env:/ext-repo/wealthfolio/.env
+      - ../actual/.env:/ext-repo/actual/.env
+      - ../pihole/.env:/ext-repo/pihole/.env
+      - ../authentik/.env:/ext-repo/authentik/.env
+      - ../paperless/.env:/ext-repo/paperless/.env
+      - ../trilium/.env:/ext-repo/trilium/.env
+      - ../backrest/.env:/ext-repo/backrest/.env
+      - ../mealie/.env:/ext-repo//mealie/.env
+
     environment:
       - BACKREST_DATA=/data
       - BACKREST_CONFIG=/config/config.json
@@ -29,8 +49,11 @@ services:
       - TZ=Europe/London
     restart: unless-stopped
     networks:
+      - external_access
       - internal_only
 
 networks:
+  external_access:
+    external: true
   internal_only:
       external: true

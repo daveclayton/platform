@@ -77,6 +77,11 @@ services:
       - traefik.http.services.paperless.loadbalancer.server.port=8000
       - traefik.http.services.paperless.loadbalancer.server.scheme=http
       - serverstransport.insecureskipverify=true
+      - homepage.group=Documents
+      - homepage.name=Paperless NGX
+      - homepage.icon=paperless-ngx.png
+      - homepage.href=http://paperless.dc404.uk/
+      - homepage.description=Document Repository
 
 
   gotenberg:

@@ -1,0 +1,48 @@
+networks:
+  internal_only:
+    external: true
+  external_access:
+    external: true
+services:
+  # Socket proxy is used by default,
+  # but you can mount docker socket directly
+  # and remove this service and DOCKER_HOST variable
+  app:
+    container_name: tugtainer
+    dns: ${DNS_SERVER}
+    image: ghcr.io/quenary/tugtainer:1
+    volumes:
+      - ${DATA_LOCATION}:/tugtainer
+      # You can uncomment this to mount socket directly,
+      # and remove socket-proxy service and DOCKER_HOST variable
+      # - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
+    environment:
+      # The list of available variables is in env.example
+      DOCKER_HOST: tcp://socket-proxy:2375
+      OIDC_ENABLED: ${OIDC_ENABLED}
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID}
+      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET}
+      OIDC_REDIRECT_URI: ${OIDC_REDIRECT_URI}
+      OIDC_WELL_KNOWN_URL: ${OIDC_WELL_KNOWN_URL}
+
+    networks:
+      - internal_only
+      - external_access
+    ports:
+      - '9412:80'
+    labels:
+      - dev.quenary.tugtainer.protected=True
+      - traefik.enable=true
+      - traefik.http.routers.tugtainer.rule=Host(`tugtainer.${BASE_DOMAIN}`)
+      - traefik.http.routers.tugtainer.tls.certresolver=letsencrypt
+      - traefik.http.routers.tugtainer.entrypoints=https
+      - traefik.http.services.tugtainer.loadbalancer.server.port=80
+      - traefik.http.services.tugtainer.loadbalancer.server.scheme=http
+      - serverstransport.insecureskipverify=true
+      - homepage.group=Admin
+      - homepage.name=Tugtainer
+      - homepage.icon=tugtainer.png
+      - homepage.href=https://tugtainer.dc404.uk/
+      - homepage.description=Container management
+
