@@ -1,6 +1,6 @@
 services:
   actual_server:
-    image: docker.io/actualbudget/actual-server:26.6.0
+    image: docker.io/actualbudget/actual-server:latest
     hostname: actual
     container_name: actual
     dns: ${DNS_SERVER}
