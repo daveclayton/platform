@@ -29,17 +29,18 @@ services:
 
       # Env files to backup
 
+      - ../actual/.env:/ext-repo/actual/.env
+      - ../authentik/.env:/ext-repo/authentik/.env
+      - ../backrest/.env:/ext-repo/backrest/.env
       - ../homepage/.env:/ext-repo/homepage/.env
       - ../immich/.env:/ext-repo/immich/.env
-      - ../traefik/.env:/ext-repo/traefik/.env
-      - ../wealthfolio/.env:/ext-repo/wealthfolio/.env
-      - ../actual/.env:/ext-repo/actual/.env
-      - ../pihole/.env:/ext-repo/pihole/.env
-      - ../authentik/.env:/ext-repo/authentik/.env
-      - ../paperless/.env:/ext-repo/paperless/.env
-      - ../trilium/.env:/ext-repo/trilium/.env
-      - ../backrest/.env:/ext-repo/backrest/.env
       - ../mealie/.env:/ext-repo//mealie/.env
+      - ../paperless/.env:/ext-repo/paperless/.env
+      - ../pihole/.env:/ext-repo/pihole/.env
+      - ../tailscale/.env:/ext-repo//tailscale/.env
+      - ../traefik/.env:/ext-repo/traefik/.env
+      - ../trilium/.env:/ext-repo/trilium/.env
+      
 
     environment:
       - BACKREST_DATA=/data

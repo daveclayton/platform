@@ -25,6 +25,7 @@ services:
       OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET}
       OIDC_REDIRECT_URI: ${OIDC_REDIRECT_URI}
       OIDC_WELL_KNOWN_URL: ${OIDC_WELL_KNOWN_URL}
+      DISABLE_PASSWORD: true
 
     networks:
       - internal_only

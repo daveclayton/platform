@@ -1,0 +1,23 @@
+services:
+  tailscale:
+    image: tailscale/tailscale:latest
+    container_name: tailscale
+    hostname: tailscale-dc404
+    restart: unless-stopped
+    dns: ${DNS_SERVER}
+    environment:
+      - TS_AUTHKEY=${DC_TS_AUTH_KEY}
+      - TS_EXTRA_ARGS=--advertise-exit-node --advertise-connector --advertise-routes=${NETWORK_ROUTE}
+      - TS_STATE_DIR=/var/lib/tailscale
+    volumes:
+      - ${DATA_LOCATION}:/var/lib/tailscale
+
+    cap_add:
+      - net_admin
+      - net_raw
+    networks:
+      - external_access
+
+networks:
+  external_access:
+    external: true
