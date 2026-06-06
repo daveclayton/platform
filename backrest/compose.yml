@@ -32,6 +32,7 @@ services:
       - ../actual/.env:/ext-repo/actual/.env
       - ../authentik/.env:/ext-repo/authentik/.env
       - ../backrest/.env:/ext-repo/backrest/.env
+      - ../donetick/.env:/ext-repo/donetick/.env 
       - ../homepage/.env:/ext-repo/homepage/.env
       - ../immich/.env:/ext-repo/immich/.env
       - ../mealie/.env:/ext-repo//mealie/.env

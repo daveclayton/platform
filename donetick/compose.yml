@@ -1,0 +1,46 @@
+services:
+  donetick:
+    image: donetick/donetick
+    container_name: donetick
+    dns: ${DNS_SERVER}
+    restart: unless-stopped
+    ports:
+      - 2021:2021
+    volumes:
+      - ${DATA_LOCATION}/data:/donetick-data
+      - ${DATA_LOCATION}/config:/config
+    environment:
+      - DT_ENV=selfhosted
+      - DT_SQLITE_PATH=/donetick-data/donetick.db
+      - TZ=Etc/UTC
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:2021/api/v1/health || exit 1
+      start_period: 1m
+      timeout: 5s
+      interval: 1m
+      retries: 3
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.donetick.rule=Host(`donetick.${BASE_DOMAIN}`)
+      - traefik.http.routers.donetick.tls.certresolver=letsencrypt
+      - traefik.http.routers.donetick.entrypoints=https
+      - traefik.http.services.donetick.loadbalancer.server.port=2021
+      - traefik.http.services.donetick.loadbalancer.server.scheme=http
+      - serverstransport.insecureskipverify=true
+      - homepage.group=Documents
+      - homepage.name=Donetick
+      - homepage.icon=donetick.png
+      - homepage.href=https://donetick.dc404.uk/
+      - homepage.description=Task and projects
+      
+
+
+    networks:
+      - internal_only
+      - external_access
+
+networks:
+  internal_only:
+    external: true
+  external_access:
+    external: true
