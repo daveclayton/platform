@@ -7,38 +7,5 @@ Create a Docker network:
 ```bash
 docker network create pub_net
 docker network create --internal internal_only
-
 ```
 
-```
-architecture-beta
-    group docker(cloud)[Docker]
-    group traefik-group(cloud)[Traefik] in docker
-    group immich-group(cloud)[Immich] in docker
-    group authentik-group(cloud)[Authentik] in docker
-    group portainer-group(cloud)[Portainer] in docker
-    group trilium-group(cloud)[Trilium] in docker
-    group pihole-group(cloud)[Pihole] in docker
-    
-    service traefik-container(server)[Traefik container] in traefik-group
-    service tailscale-container(server)[Tailscale container] in traefik-group
-    service whoami-container(server)[Whoami container] in traefik-group
-    
-    service authentik(server)[Authentik] in authentik-group
-    
-    service pihole(server)[Pihole] in pihole-group
-
-    service immich(server)[Immich] in immich-group
-    
-    service tailscale-external(internet)[Tailscale external service]
-    
-    tailscale-external:R -- L:tailscale-container
-    tailscale-container:R -- L:traefik-container
-    whoami-container:L -- R:traefik-container
-
-    authentik:B -- T:traefik-container
-    immich:T -- B:traefik-container
-        %% db:L -- R:server
-    %% disk1:T -- B:server
-    %% disk2:T -- B:db
-```
